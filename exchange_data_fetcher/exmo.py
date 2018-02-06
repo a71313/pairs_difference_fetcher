@@ -9,8 +9,11 @@ class ExmoPairFetcher(ExchangePairFetcher):
         return '{}/{}'.format(*name.split('_'))
 
     def canonize(self, pairs):
-        return {self.convert_name(p_name): float(p_data['buy_price']) for p_name, p_data in pairs.items()}
+        return {self.convert_name(p_name): float(p_data['buy_price'], 4) for p_name, p_data in pairs.items()}
 
     async def get_pairs(self):
-        pairs = await self.fetcher.fetch(self.url)
+        try:
+            pairs = await self.fetcher.fetch(self.url)
+        except Exception as e:
+            print(f'Something went wrong {e}. Skip {self.exchange_name}')
         return {'data': self.canonize(pairs), 'exchange_name': self.exchange_name}
