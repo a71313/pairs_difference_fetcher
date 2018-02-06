@@ -46,7 +46,7 @@ class ApplicationImpl(Application):
                 diff = round(abs(v1 - v2), 4)
                 diff_perc = round(max(v1, v2) * self.difference, 4)
 
-                if diff > diff_perc:
+                if diff > diff_perc and v1 and v2:
                     comparation[pair_name] = {
                         exch_1_name: v1,
                         exch_2_name: v2,
