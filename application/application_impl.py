@@ -1,6 +1,9 @@
 import asyncio
 
+from aiohttp import web
+
 from application import Application
+from application.routing import router
 from exchange_data_fetcher.bitlish import BitlishPairFetcher
 from exchange_data_fetcher.exmo import ExmoPairFetcher
 from pool import Pool
@@ -52,10 +55,18 @@ class ApplicationImpl(Application):
 
             except KeyError:
                 pass
-                import traceback
-                traceback.print_exc()
         return comparation
 
     def run(self):
-        self.loop.run_until_complete(self.get_currency_difference())
-        # self.loop.run_forever()
+        self._init_api()
+        self.loop.run_until_complete(future=self._serv_generator)
+        self.loop.run_forever()
+
+    def _init_api(self):
+        self.web_app = web.Application(loop=self.loop, router=router)
+        handler = self.web_app.make_handler()
+        self._serv_generator = self.loop.create_server(
+            handler,
+            "0.0.0.0",
+            8080,
+        )
