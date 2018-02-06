@@ -4,7 +4,7 @@ from fetcher import Fetcher
 
 
 class AsyncFetcher(Fetcher):
-    async def fetch(self, url, method="get", data=None, success_http_codes=(200,)):
+    async def fetch(self, url, method="get", data=None):
         if not data:
             data = {}
 
