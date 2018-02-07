@@ -1,4 +1,6 @@
 import asyncio
+from collections import defaultdict
+from time import time
 
 from aiohttp import web
 
@@ -12,6 +14,8 @@ from pool import Pool
 class ApplicationImpl(Application):
     loop = asyncio.get_event_loop()
     difference = 0.01
+
+    state = defaultdict(list)
 
     def __init__(self, usable_exchange_fetchers=None):
         super().__init__()
@@ -60,6 +64,7 @@ class ApplicationImpl(Application):
     def run(self):
         self._init_api()
         self.loop.run_until_complete(future=self._serv_generator)
+        asyncio.ensure_future(self._periodic_diff_fetch())
         self.loop.run_forever()
 
     def _init_api(self):
@@ -70,3 +75,12 @@ class ApplicationImpl(Application):
             "0.0.0.0",
             8080,
         )
+
+    async def _periodic_diff_fetch(self):
+        while True:
+            diff = await self.get_currency_difference()
+            if diff:
+                now = int(time() * 1000)
+                for pair, value in diff.items():
+                    self.state[pair].append((now, value['diff']))
+            await asyncio.sleep(5)

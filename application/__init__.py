@@ -6,11 +6,9 @@ from application.app_config import configurate
 
 
 class Application(metaclass=ABCMeta):
-
     @abstractmethod
     def get_currency_difference(self):
         pass
-    
 
     @abstractmethod
     def run(self):

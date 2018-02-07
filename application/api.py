@@ -10,3 +10,15 @@ async def get_diff(request, app):
     if not data:
         return web.json_response(data='Temporary unavailable')
     return web.json_response(data=data)
+
+
+async def index_view(request):
+    return web.FileResponse('./static/index.html')
+
+
+@inject.params(app=Application)
+async def get_diff_timeline(request, app):
+    cur1 = request.match_info['cur1']
+    cur2 = request.match_info['cur2']
+    pair = f'{cur1}/{cur2}'
+    return web.json_response(app.state[pair])
